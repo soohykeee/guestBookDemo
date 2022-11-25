@@ -4,7 +4,10 @@ import com.example.guestbookdemo.dto.GuestbookDTO;
 import com.example.guestbookdemo.dto.PageRequestDTO;
 import com.example.guestbookdemo.dto.PageResultDTO;
 import com.example.guestbookdemo.entity.Guestbook;
+import com.example.guestbookdemo.entity.QGuestbook;
 import com.example.guestbookdemo.repository.GuestbookRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -55,16 +58,47 @@ public class GuestbookServiceImpl implements GuestbookService {
         }
     }
 
-
     @Override
     public PageResultDTO<GuestbookDTO, Guestbook> getList(PageRequestDTO requestDTO) {
 
         Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
 
-        Page<Guestbook> result = repository.findAll(pageable);
+        BooleanBuilder booleanBuilder = getSearch(requestDTO);
+
+        Page<Guestbook> result = repository.findAll(booleanBuilder, pageable);
 
         Function<Guestbook, GuestbookDTO> fn = (entity -> entityToDto(entity));
 
         return new PageResultDTO<>(result, fn);
     }
+
+    private BooleanBuilder getSearch(PageRequestDTO requestDTO) {
+        String type = requestDTO.getType();
+        String keyword = requestDTO.getKeyword();
+        QGuestbook qGuestbook = QGuestbook.guestbook;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        BooleanExpression expression = qGuestbook.gno.gt(0L);       //gno > 0 조건 생성
+        booleanBuilder.and(expression);
+
+        if (type == null || type.trim().length() == 0) {        // 검색 type이 없는 경우
+            return booleanBuilder;
+        }
+
+        BooleanBuilder conditionBuilder = new BooleanBuilder();
+
+        if (type.contains("t")) {
+            conditionBuilder.or(qGuestbook.title.contains(keyword));
+        } if (type.contains("c")) {
+            conditionBuilder.or(qGuestbook.content.contains(keyword));
+        } if (type.contains("w")) {
+            conditionBuilder.or(qGuestbook.writer.contains(keyword));
+        }
+
+        booleanBuilder.and(conditionBuilder);
+        return booleanBuilder;
+    }
+
+
 }

@@ -14,6 +14,8 @@ public class PageRequestDTO {
 
     private int page;
     private int size;
+    private String type;
+    private String keyword;
 
     // 페이지 1개당 10개씩 목록으로 보여주는 기본값을 생성자로 세팅
     public PageRequestDTO() {
