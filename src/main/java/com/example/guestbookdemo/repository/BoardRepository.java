@@ -34,5 +34,4 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             countQuery = "select count(b) from Board b")
     Object getBoardByBno(@Param("bno") Long bno);
 
-
 }
