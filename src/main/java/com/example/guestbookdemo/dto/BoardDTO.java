@@ -23,7 +23,7 @@ public class BoardDTO {
 
     private LocalDateTime regDate;
 
-    private LocalDateTime modDage;
+    private LocalDateTime modDate;
 
     private int replyCount;
 

@@ -36,7 +36,7 @@ public interface BoardService {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .regDate(board.getRegDate())
-                .modDage(board.getModDate())
+                .modDate(board.getModDate())
                 .writerEmail(member.getEmail())
                 .writerName(member.getName())
                 .replyCount(replyCount.intValue())
